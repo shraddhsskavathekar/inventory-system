@@ -1,0 +1,907 @@
+import java.awt.Color;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.*;
+
+public class MainClass {
+
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+	
+		Login l=new Login("Login page");
+		//Inventory i=new Inventory("Inventory System");
+		DB.DeleteTableData();
+
+	}
+
+}
+class Login implements ActionListener
+{
+	JFrame frame;
+	JLabel lID,lPwd,lImg;
+	JTextField tID;
+	JPasswordField pwd;
+	
+	JButton btnlogin,btncancel;
+	
+	public Login(String string)
+	{
+		frame =new JFrame(string);
+		JPanel panel=(JPanel) frame.getContentPane();
+		panel.setLayout(null);
+		
+		JLabel l=new JLabel();
+		l.setBounds(40,50,70,70);
+		ImageIcon img=new ImageIcon(new ImageIcon("C:\\Users\\SHRADDHA\\eclipse-workspace\\Systeminventoty\\src\\login.jpg").getImage().getScaledInstance(70, 70, Image.SCALE_DEFAULT));
+		l.setIcon(img);
+		panel.add(l);
+		
+		lID=new JLabel("Login :");
+		lID.setBounds(130,50,80,30);
+		panel.add(lID);
+		
+		lPwd=new JLabel("Password :");
+		lPwd.setBounds(130, 90, 80, 30);
+		panel.add(lPwd);
+		
+		tID=new JTextField();
+		tID.setBounds(210, 55, 100, 22);
+		panel.add(tID);
+		
+		pwd=new JPasswordField();
+		pwd.setBounds(210, 95, 100, 22);
+		panel.add(pwd);
+		
+		btncancel=new JButton("Clear");
+		btnlogin=new JButton("Login");
+		btnlogin.setBounds(140, 135, 65, 20);
+		panel.add(btnlogin);
+		
+		btncancel.setBounds(215, 135, 80, 20);
+		panel.add(btncancel);
+		
+		btnlogin.addActionListener(this);
+		btncancel.addActionListener(this);
+		
+		
+		
+		frame.setLocationRelativeTo(null);
+		frame.pack();
+		frame.setSize(400,230);
+		frame.setVisible(true);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+	}
+	@Override
+	public void actionPerformed(ActionEvent ae) {
+	
+		if(ae.getActionCommand().equals("Login"))
+		{
+			if(tID.getText().equals("Admin")&&pwd.getText().equals("Admin"))
+			{
+				JOptionPane.showMessageDialog(frame, "User Login Successfully", "Login Success", JOptionPane.INFORMATION_MESSAGE);
+				frame.dispose();
+				try {
+					Inventory i =new Inventory("Inventory System");
+				} catch (ClassNotFoundException | SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			else
+				JOptionPane.showMessageDialog(frame, "Authentication Failed", "Login Failed", JOptionPane.ERROR_MESSAGE);
+		}
+		if(ae.getActionCommand().equals("Clear"))
+		{
+			tID.setText("");
+			pwd.setText("");
+		}
+		
+	}
+}
+
+class Inventory implements ActionListener
+{
+	JFrame frame;
+	JPanel p1;
+	JPanel p2;
+	JPanel p3;
+	JPanel p4;
+	JTable t;
+	JScrollPane sp;
+	JComboBox c;
+	//p2
+	JLabel l1,l2,l3,l4;
+	JTextField t1,t2,t3,t4;
+	Connection connection = null;
+    Statement statement = null;
+    ResultSet rs = null;
+	JButton b1,b2,b3,br1,br2;
+	
+
+	JLabel ul1,ul2,ul3;
+	JTextField ut1,ut2,ut3;
+	JButton ub1,ub2;
+	
+	
+	JLabel pl1,pl2,pl3,pl4,pl5,pl6;
+	JTextField pt1,pt2,pt3,pt4;
+	JButton pb1,pb2,pb3,br3;
+	JTable tbl1;
+	JScrollPane sp1;
+	public int total=0;
+	public String[] stringitem=new String[10];
+	public int  [] intquality=new int[10];
+	public Inventory(String string) throws ClassNotFoundException, SQLException
+	{
+		frame=new JFrame(string);
+		JPanel panel=(JPanel) frame.getContentPane();
+		panel.setLayout(null);
+		
+		p1=new JPanel();		//Excel Sheet
+		p2=new JPanel();		//Add/Delete
+		p3=new JPanel();		//Update
+		p4=new JPanel();		//Purchase
+		
+		
+		JTabbedPane tp=new JTabbedPane();
+		tp.setBounds(1, 2, 750, 550);
+		
+		p1.setLayout(null);
+		p2.setLayout(null);
+		p3.setLayout(null);
+		p4.setLayout(null);
+		
+		tp.add("Excel Sheet", p1);
+		tp.addTab("Add/Delete", p2);
+		tp.add("Update", p3);
+		tp.add("Purchase", p4);
+		
+		frame.add(tp);
+		frame.pack();
+		frame.setVisible(true);
+		frame.setSize(770, 600);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		
+		
+		//**********************p1**********************
+			
+		
+		p1.setLayout(null);
+		
+		
+		Object d[][]=DB.getData();
+		
+		String column[]= {"Sr.No","Item","Qty.","Price"};
+		t=new JTable(d,column);
+		t.setBounds(30, 20, 630,300);
+		sp=new JScrollPane(t);
+		sp.setBounds(t.getBounds());
+		p1.add(sp);
+		
+		br1=new JButton("Refresh");
+		br1.setBounds(660,20,80,20);
+		p1.add(br1);
+		br1.addActionListener(this);
+		//********************p2************************
+		
+		p2.setLayout(null);
+		
+		l1 =new JLabel("Item :");
+		l1.setBounds(30, 20, 60, 30);
+		p2.add(l1);
+		
+		l2 =new JLabel("Qty. :");
+		l2.setBounds(30, 60, 60, 30);
+		p2.add(l2);
+		
+		l3 =new JLabel("Price :");
+		l3.setBounds(30, 100, 60, 30);
+		p2.add(l3);
+		
+		t1=new JTextField();
+		t1.setBounds(90, 22, 100, 20);
+		p2.add(t1);
+		
+		t2=new JTextField();
+		t2.setBounds(90, 62, 100, 20);
+		p2.add(t2);
+		
+		t3=new JTextField();
+		t3.setBounds(90, 102, 100, 20);
+		p2.add(t3);
+	
+		b1=new JButton("Add");
+		b1.setBounds(40, 135, 60, 25);
+		p2.add(b1);
+		
+		b2=new JButton("Clear");
+		b2.setBounds(110, 135, 70, 25);
+		p2.add(b2);
+		
+		l4 =new JLabel("Item :");
+		l4.setBounds(30, 190, 60, 30);
+		p2.add(l4);
+		
+		t4=new JTextField();
+		t4.setBounds(90, 192, 150, 20);
+		p2.add(t4);
+		
+		b3=new JButton("Delete");
+		b3.setBounds(255, 190, 70, 25);
+		p2.add(b3);
+		
+		
+		b1.addActionListener(this);
+		b2.addActionListener(this);
+		b3.addActionListener(this);
+		//********************p3********************
+		
+		p3.setLayout(null);
+		
+		br2=new JButton("Refresh");
+		br2.setBounds(660,20,80,20);
+		p3.add(br2);
+		
+		ul1 =new JLabel("Item :");
+		ul1.setBounds(30, 20, 60, 30);
+		p3.add(ul1);
+		
+		ul2 =new JLabel("Qty. :");
+		ul2.setBounds(30, 60, 60, 30);
+		p3.add(ul2);
+		
+		ul3 =new JLabel("Price :");
+		ul3.setBounds(30, 100, 60, 30);
+		p3.add(ul3);
+		
+		ut1=new JTextField();
+		ut1.setBounds(90, 22, 100, 20);
+		p3.add(ut1);
+		
+		JLabel umsg=new JLabel("Select Item which u want to Update:");
+		umsg.setBounds(200,22,220,20);
+		p3.add(umsg);
+		
+		
+		try {
+			 
+            Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+            
+        }
+        catch(ClassNotFoundException cnfex) {
+ 
+            System.out.println("Problem in loading or "
+                    + "registering MS Access JDBC driver");
+            cnfex.printStackTrace();
+        }
+        try {
+ 
+            String msAccDB = "\\Users\\SHRADDHA\\eclipse-workspace\\Systeminventoty\\src\\db1.accdb";
+            String dbURL = "jdbc:ucanaccess://" + msAccDB; 
+ 
+            connection = DriverManager.getConnection(dbURL); 
+            statement = connection.createStatement();
+            rs = statement.executeQuery("SELECT * FROM System");
+            c=new JComboBox();
+            c.setBounds(430, 22, 150, 20);
+    		
+            while(rs.next()) {
+            	
+                c.addItem(rs.getString(2));
+                
+            }
+
+            p3.add(c);
+ 	        }
+        catch(SQLException sqlex){
+            sqlex.printStackTrace();
+        }
+		
+		
+		
+		
+		
+		ut2=new JTextField();
+		ut2.setBounds(90, 62, 100, 20);
+		p3.add(ut2);
+		
+		ut3=new JTextField();
+		ut3.setBounds(90, 102, 100, 20);
+		p3.add(ut3);
+	
+		ub1=new JButton("Update");
+		ub1.setBounds(40, 135, 90, 25);
+		p3.add(ub1);
+		
+		ub2=new JButton("Clear");
+		ub2.setBounds(140, 135, 70, 25);
+		p3.add(ub2);
+		br2.addActionListener(this);
+		ub1.addActionListener(this);
+		//************************p4*********************
+		
+		p1.setBackground(Color.lightGray);
+		p2.setBackground(Color.LIGHT_GRAY);
+		p3.setBackground(Color.LIGHT_GRAY);
+		p4.setBackground(Color.LIGHT_GRAY);
+		
+		p4.setLayout(null);
+		pl1 =new JLabel("Sr NO :");
+		pl1.setBounds(30, 20, 60, 30);
+		p4.add(pl1);
+		
+		br3=new JButton("Refresh");
+		br3.setBounds(660,20,80,20);
+		p4.add(br3);
+		br3.addActionListener(this);
+		
+		pt1=new JTextField();
+		pt1.setBounds(90, 22, 100, 20);
+		p4.add(pt1);
+	
+		pl2 =new JLabel("Qty.  :");
+		pl2.setBounds(200, 20, 60, 30);
+		p4.add(pl2);
+		
+		pt2=new JTextField();
+		pt2.setBounds(260, 22, 100, 20);
+		p4.add(pt2);
+		
+		pb1=new JButton("Purchase");
+		pb1.setBounds(30,60,100,25);
+		p4.add(pb1);
+		
+		pb1.addActionListener(this);
+		
+		pl3=new JLabel("Item(s) Purchesed");
+		pl3.setBounds(30,95,120,30);
+		p4.add(pl3);
+		
+		
+		
+		
+		Object[][] data1=DB.getData1();
+		
+		String column1[]= {"Item","Qty.","Price","Total Price"};
+		tbl1=new JTable(data1,column1);
+		tbl1.setBounds(20, 130, 600,200);
+		sp1=new JScrollPane(tbl1);
+		sp1.setBounds(tbl1.getBounds());
+		p4.add(sp1);
+		
+		
+		pb2=new JButton("Calculate");
+		pb2.setBounds(20, 340, 90, 30);
+		p4.add(pb2);
+		pb2.addActionListener(this);
+		
+		pl4=new JLabel("Total Price :");
+		pl4.setBounds(120,340,70,20);
+		p4.add(pl4);
+		
+		pl5=new JLabel();
+		pl5.setBounds(200,340,90,20);
+		p4.add(pl5);
+		
+		
+		pl6=new JLabel("Enter money :");
+		pl6.setBounds(20, 380, 90, 20);
+		p4.add(pl6);
+		
+		pt3=new JTextField();
+		pt3.setBounds(110, 380, 70, 22);
+		p4.add(pt3);
+		
+		pb3=new JButton("Pay");
+		pb3.setBounds(185, 380, 70, 20);
+		p4.add(pb3);
+		pb3.addActionListener(this);
+		
+	}
+	@Override
+	public void actionPerformed(ActionEvent ae) {
+		if(ae.getSource().equals(br1))
+		{
+			Object d[][] = null;
+			try {
+				d = DB.getData();
+			} catch (ClassNotFoundException | SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			String column[]= {"Sr.No","Item","Qty.","Price"};
+			t=new JTable(d,column);
+			t.setBounds(30, 20, 630,300);
+			sp=new JScrollPane(t);
+			sp.setBounds(t.getBounds());
+			p1.add(sp);	
+		}
+		if(ae.getActionCommand().equals("Add"))
+		{
+			try {
+				Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+				
+				String msAccDB = "\\Users\\SHRADDHA\\eclipse-workspace\\Systeminventoty\\src\\db1.accdb";
+	            String dbURL = "jdbc:ucanaccess://" + msAccDB; 
+	 
+	            Connection connection = DriverManager.getConnection(dbURL); 
+	 
+				Statement statement = connection.createStatement();
+				ResultSet rs1=statement.executeQuery("SELECT * FROM System");
+				int size=0;
+				
+				while (rs1.next())
+				{
+					size++;
+				}
+				String item=t1.getText();
+				int qty=Integer.parseInt(t2.getText());
+				int price=Integer.parseInt(t3.getText());
+				//statement.executeUpdate("insert into System values("+size+",'"+item+","+qty+","+price+")");
+				
+				
+				String query = " insert into System "
+				        + " values (?, ?, ?, ?)";
+				      PreparedStatement preparedStmt = connection.prepareStatement(query);
+				      preparedStmt.setInt (1, size);
+				      preparedStmt.setString (2, item);
+				      preparedStmt.setInt   (3, qty);
+				      preparedStmt.setInt(4, price);
+				      preparedStmt.execute();
+				//System.out.println("Su");
+				      JOptionPane.showMessageDialog(frame, "Data insert Successfully", "Insert", JOptionPane.INFORMATION_MESSAGE);
+				t1.setText("");
+				t2.setText("");
+				t3.setText("");
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if(ae.getSource().equals(br2))
+		{
+			
+			try {
+				 
+	            Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+	            
+	        }
+	        catch(ClassNotFoundException cnfex) {
+	 
+	            System.out.println("Problem in loading or "
+	                    + "registering MS Access JDBC driver");
+	            cnfex.printStackTrace();
+	        }
+	        try {
+	 
+	            String msAccDB = "\\Users\\SHRADDHA\\eclipse-workspace\\Systeminventoty\\src\\db1.accdb";
+	            String dbURL = "jdbc:ucanaccess://" + msAccDB; 
+	 
+	            connection = DriverManager.getConnection(dbURL); 
+	            statement = connection.createStatement();
+	            rs = statement.executeQuery("SELECT * FROM System");
+	            //c=new JComboBox();
+	            //c.setBounds(430, 22, 150, 20);
+	    		
+	            
+	            	c.removeAllItems();
+	            
+	            while(rs.next()) {
+	            	
+	                c.addItem(rs.getString(2));
+	                
+	            }
+
+	            //p3.add(c);
+	 	        }
+	        catch(SQLException sqlex){
+	            sqlex.printStackTrace();
+	        }
+			
+
+			
+		}
+		if(ae.getSource().equals(pb1))//purchase
+		{
+			
+			try {
+				 
+	            Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+	            
+	        }
+	        catch(ClassNotFoundException cnfex) {
+	 
+	            System.out.println("Problem in loading or "
+	                    + "registering MS Access JDBC driver");
+	            cnfex.printStackTrace();
+	        }
+	        try {
+	 
+	            String msAccDB = "\\Users\\SHRADDHA\\eclipse-workspace\\Systeminventoty\\src\\db1.accdb";
+	            String dbURL = "jdbc:ucanaccess://" + msAccDB; 
+	 
+	            connection = DriverManager.getConnection(dbURL); 
+	            statement = connection.createStatement();
+	            int sr=Integer.parseInt(pt1.getText());
+	            int qt=Integer.parseInt(pt2.getText());
+	            String query="SELECT * FROM System where SrNo = "+sr+"";
+	            rs = statement.executeQuery(query);
+	           
+	            String is = null;
+	            int qs = 0,ps = 0;
+	            while(rs.next()) 
+	            {	
+	                is=rs.getString(2);
+	                ps=rs.getInt(4);   
+	            }
+	            
+	            
+	            int tp=qt*ps;
+	           String  sql = " insert into Purchase "
+				        + " values (?, ?, ?, ?)";
+				      PreparedStatement preparedStmt = connection.prepareStatement(sql);
+				      preparedStmt.setString (4, is);
+				      preparedStmt.setInt (1, qt);
+				      preparedStmt.setInt   (2, ps);
+				      preparedStmt.setInt(3, tp);
+				      preparedStmt.execute();
+				
+				      JOptionPane.showMessageDialog(frame, "Data insert Successfully", "Insert", JOptionPane.INFORMATION_MESSAGE);	        connection.close();
+				      pt1.setText("");
+				      pt2.setText("");
+	        }catch(Exception e) {e.printStackTrace();
+	        
+	        }
+
+			
+		}
+		if(ae.getSource().equals(br3))
+		{
+			
+			Object d[][] = null;
+			try {
+				d = DB.getData1();
+			} catch (ClassNotFoundException | SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			String column1[]= {"Item","Qty.","Price","Total Price"};
+			tbl1=new JTable(d,column1);
+			tbl1.setBounds(20, 130, 600,200);
+			sp1=new JScrollPane(tbl1);
+			sp1.setBounds(tbl1.getBounds());
+			p4.add(sp1);
+		
+		}
+		
+			if(ae.getSource().equals(pb3))//pay
+			{
+				if(!(pt3.getText().equals(pl5.getText())))
+				{
+					JOptionPane.showMessageDialog(frame, "Please Enter accurate Money", "Wrong", JOptionPane.ERROR_MESSAGE);
+				}
+				else
+				{
+					try
+					{
+					Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+					String msAccDB = "\\Users\\SHRADDHA\\eclipse-workspace\\Systeminventoty\\src\\db1.accdb";
+		            String dbURL = "jdbc:ucanaccess://" + msAccDB; 
+		 
+		            connection = DriverManager.getConnection(dbURL); 
+		            statement = connection.createStatement();
+		            ResultSet rs=statement.executeQuery("Select * from Purchase");
+		            int i=0;
+		            while(rs.next())
+		            {
+		            	stringitem[i]=rs.getString(4);
+		            	intquality[i]=rs.getInt(1);
+		            	i++;
+		            }
+		            
+		            
+					
+					}catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+					
+				
+				
+				try
+				{
+					
+					int acc=0;
+					String stmt="";
+					for(int i=0;i<intquality.length;i++)
+					{
+						stmt="Select * from System where Item = '"+stringitem[i]+"'";
+						ResultSet rs1=statement.executeQuery(stmt);
+			            
+			            while(rs1.next())
+			            {
+			            	acc=rs1.getInt(3);
+			            }
+			            
+					PreparedStatement updateQuery = connection.prepareStatement("update System set Quality=?   where Item= ? ");
+	                
+					acc-=intquality[i];
+	                updateQuery.setInt(1, acc);
+	                
+	                updateQuery.setString(2, stringitem[i]);
+
+	                updateQuery.executeUpdate();
+					}
+					System.out.println("success");
+					JOptionPane.showMessageDialog(frame, "Payment Done Successfully", "Payment", JOptionPane.INFORMATION_MESSAGE);
+					DB.DeleteTableData();
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			}
+		if(ae.getSource().equals(b2))
+		{
+			t1.setText("");
+			t2.setText("");
+			t3.setText("");
+		}
+		if(ae.getActionCommand().equals("Update"))
+		{
+			try {
+				 
+	            Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+	            
+	        }
+	        catch(ClassNotFoundException cnfex) {
+	 
+	            System.out.println("Problem in loading or "
+	                    + "registering MS Access JDBC driver");
+	            cnfex.printStackTrace();
+	        }
+	        try {
+	 
+	            String msAccDB = "\\Users\\SHRADDHA\\eclipse-workspace\\Systeminventoty\\src\\db1.accdb";
+	            String dbURL = "jdbc:ucanaccess://" + msAccDB; 
+	 
+	            connection = DriverManager.getConnection(dbURL); 
+	            statement = connection.createStatement();
+	            String itemupdate=ut1.getText();
+	            int qualityupdate=Integer.parseInt(ut2.getText());
+	            int priceupdate=Integer.parseInt(ut3.getText());
+	            String cmb=c.getSelectedItem().toString();
+	            
+	            PreparedStatement updateQuery = connection.prepareStatement("update System set Item=? , Quality=? , Price=?  where Item= ? ");
+                updateQuery.setString(1, itemupdate);
+                updateQuery.setInt(2, qualityupdate);
+                updateQuery.setInt(3, priceupdate);
+                updateQuery.setString(4, cmb);
+
+                updateQuery.executeUpdate();
+
+	            //sstatement.executeUpdate("update table System set Item='"+itemupdate+"'Quality="+qualityupdate+" Price="+priceupdate+"  where Item='"+cmb+"'");
+	            JOptionPane.showMessageDialog(frame, "Data Updated Successfully", "Update", JOptionPane.INFORMATION_MESSAGE);
+	        }
+	        catch(SQLException sqlex){
+	            sqlex.printStackTrace();
+	        }
+			
+
+		}
+		if(ae.getSource().equals(pb2))
+		{
+			
+			try
+			{
+				
+				Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+				
+				String msAccDB = "\\Users\\SHRADDHA\\eclipse-workspace\\Systeminventoty\\src\\db1.accdb";
+	            String dbURL = "jdbc:ucanaccess://" + msAccDB; 
+	 
+	            Connection connection = DriverManager.getConnection(dbURL); 
+	 
+				Statement statement = connection.createStatement();
+				String query="SELECT * FROM Purchase";
+	            ResultSet rs1 = statement.executeQuery(query);
+	            
+	            total=0;
+	            while (rs1.next())
+	            {
+	            	total+=rs1.getInt(3);
+	            }
+	            //Dhanraj
+	            String str=String.valueOf(total);
+				pl5.setText(str);
+	            //System.out.println(total);
+			}catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			
+		}
+		if(ae.getActionCommand().equals("Delete"))
+		{
+			try {
+				Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+				
+				String msAccDB = "\\Users\\SHRADDHA\\eclipse-workspace\\Systeminventoty\\src\\db1.accdb";
+	            String dbURL = "jdbc:ucanaccess://" + msAccDB; 
+	 
+	            Connection connection = DriverManager.getConnection(dbURL); 
+	 
+				Statement statement = connection.createStatement();
+				String itmdelete=t4.getText();
+				statement.executeUpdate("Delete from System where Item='"+itmdelete+"'");
+				t4.setText("");
+				JOptionPane.showMessageDialog(frame, "Data Deleted Successfully", "Delete", JOptionPane.INFORMATION_MESSAGE);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+}
+
+class DB
+{
+	
+	
+	public static Object[][] getData() throws ClassNotFoundException, SQLException
+	{
+		Object data[][] = null;
+		        
+		    Connection connection = null;
+	        Statement statement = null;
+	        ResultSet rs = null;
+	        try {
+	 
+	            Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+	            
+	        }
+	        catch(ClassNotFoundException cnfex) {
+	 
+	            System.out.println("Problem in loading or "
+	                    + "registering MS Access JDBC driver");
+	            cnfex.printStackTrace();
+	        }
+	        try {
+	 
+	            String msAccDB = "\\Users\\SHRADDHA\\eclipse-workspace\\Systeminventoty\\src\\db1.accdb";
+	            String dbURL = "jdbc:ucanaccess://" + msAccDB; 
+	 
+	            connection = DriverManager.getConnection(dbURL); 
+	            statement = connection.createStatement();
+	            rs = statement.executeQuery("SELECT * FROM System");
+	            
+	            data=new Object[10][10];
+	            int i=0;
+	            while(rs.next()) {
+	            	int j=0;
+	                /*System.out.println(rs.getInt(1) + "\t" + 
+	                        rs.getString(2) + "\t" + 
+	                        rs.getString(3) + "\t" +
+	                        rs.getString(4));*/
+	                data[i][j++]=rs.getInt(1);
+	                data[i][j++]=rs.getString(2);
+	                data[i][j++]=rs.getInt(3);
+	                data[i][j++]=rs.getInt(4);
+	             i++;   
+	            }
+
+	            
+	 	        }
+	        catch(SQLException sqlex){
+	            sqlex.printStackTrace();
+	        }
+	        finally {
+	            try {
+	                if(null != connection) {
+	                    rs.close();
+	                }
+	            }
+	            catch (SQLException sqlex) {
+	                sqlex.printStackTrace();
+	            }
+	        }
+	 
+		return data;
+	}
+
+	public static Object[][] getData1() throws ClassNotFoundException, SQLException
+	{
+		Object data[][] = null;
+		        
+		    Connection connection = null;
+	        Statement statement = null;
+	        ResultSet rs = null;
+	        try {
+	 
+	            Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+	            
+	        }
+	        catch(ClassNotFoundException cnfex) {
+	 
+	            System.out.println("Problem in loading or "
+	                    + "registering MS Access JDBC driver");
+	            cnfex.printStackTrace();
+	        }
+	        try {
+	 
+	            String msAccDB = "\\Users\\SHRADDHA\\eclipse-workspace\\Systeminventoty\\src\\db1.accdb";
+	            String dbURL = "jdbc:ucanaccess://" + msAccDB; 
+	 
+	            connection = DriverManager.getConnection(dbURL); 
+	            statement = connection.createStatement();
+	            rs = statement.executeQuery("SELECT * FROM Purchase");
+	            
+	            data=new Object[10][10];
+	            int i=0;
+	            while(rs.next()) {
+	            	int j=0;
+	                /*System.out.println(rs.getInt(1) + "\t" + 
+	                        rs.getString(2) + "\t" + 
+	                        rs.getString(3) + "\t" +
+	                        rs.getString(4));*/
+	            	data[i][j++]=rs.getString(4);
+	            	data[i][j++]=rs.getInt(1);
+	                data[i][j++]=rs.getInt(2);
+	                data[i][j++]=rs.getInt(3);
+	             i++;   
+	            }
+
+	            
+	 	        }
+	        catch(SQLException sqlex){
+	            sqlex.printStackTrace();
+	        }
+	        finally {
+	            try {
+	                if(null != connection) {
+	                    rs.close();
+	                }
+	            }
+	            catch (SQLException sqlex) {
+	                sqlex.printStackTrace();
+	            }
+	        }
+	 
+		return data;
+	}
+
+
+	public static void DeleteTableData()
+	{
+		try
+		{
+			Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+			String msAccDB = "\\Users\\SHRADDHA\\eclipse-workspace\\Systeminventoty\\src\\db1.accdb";
+            String dbURL = "jdbc:ucanaccess://" + msAccDB; 
+ 
+            Connection connection = DriverManager.getConnection(dbURL); 
+            Statement statement = connection.createStatement();
+			String q="Delete * from purchase";
+			statement.executeUpdate(q);
+			System.out.println("Delete Successfully");
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
